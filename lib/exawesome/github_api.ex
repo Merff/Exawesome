@@ -5,13 +5,15 @@ defmodule Exawesome.GithubApi do
 
   def get_repo_info(repo_owner, repo_name) do
     url = "#{@base_path}/#{repo_owner}/#{repo_name}"
-    credentials = Application.get_env(:exawesome, :github_user) <> ":" <> Application.get_env(:exawesome, :github_token)
+    credentials =
+      Application.get_env(:exawesome, :github_user)
+      <> ":"
+      <> Application.get_env(:exawesome, :github_token)
+      |> Base.encode64()
     headers = [
       {"Authorization", "Basic #{credentials}"},
       {"X-GitHub-Media-Type", "application/vnd.github.scarlet-witch-preview+json"}
     ]
-
-    #require IEx; IEx.pry()
 
     case HTTPoison.get(url, headers) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->

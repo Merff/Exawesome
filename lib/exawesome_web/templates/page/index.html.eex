@@ -1,13 +1,59 @@
+<p>
+  Elixir is awesome. And it has a vast awesome list: h4cc/awesome-elixir. This is a mirror of it where each library is marked with number of stars at Github and number of days since the last commit.
+</p>
+
+<h2> Filter stars </h2>
+
+<strong><a href="/">All</a></strong><br>
+<%= for min_stars <- [10, 50, 100, 500, 1000] do %>
+  <strong>
+    ☆
+    <a href="?min_stars=<%= min_stars %>"><%= min_stars %></a>
+    <br>
+  </strong>
+<% end %>
+<br>
+
+<h2> Categories </h2>
 <%= for category <- @categories do %>
-  <h2> <%= category.name %> </h2>
-  <p><em> <%= category.description %> </em></p>
+  <a href="#<%= category.name %>"><%= category.name %></a><br>
+<% end %>
+<br>
+
+<%= for category <- @categories do %>
+  <h2 id="<%= category.name %>"><%= category.name %></h2>
+  <p><em><%= category.description %></em></p>
 
   <ul>
     <%= for lib <- category.libs do %>
       <li>
         <a href="<%= lib.href %>"> <%= lib.name %> </a>
-        <span>stars(<%= lib.stars %>)</span>
-        <span><%= lib.description %></span>
+        <span><%= lib.description %></span><br>
+
+        <span>
+          <%= if lib.stars do %>
+            ☆&nbsp;&nbsp;<small><em><%= lib.stars %></em></small>
+          <% else %>
+            ☆&nbsp;&nbsp;🤷
+          <% end %>
+        </span>
+        <br>
+
+        <span>
+          <% days_left = days_left_from_last_commit(lib.last_commit, @utc_now) %>
+          <%= cond do %>
+            <% is_nil(days_left) -> %>
+              🙀 🤷
+            <% days_left <= 100 -> %>
+              😺
+            <% days_left > 100 && days_left < 300 -> %>
+              😿
+            <% days_left >= 300 -> %>
+              🙀
+          <% end %>
+          <small><em><%= days_left %> days</small></em>
+        </span>
+      </li>
     <% end %>
   </ul>
 <% end %>

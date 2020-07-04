@@ -1,11 +1,24 @@
 defmodule Exawesome.CategoryContext do
-  import Ecto.Query, only: [from: 2]
-  alias Exawesome.{Category, Lib, Repo}
+  import Ecto.Query, only: [from: 2, dynamic: 2]
+  alias Exawesome.{Category, Repo}
 
-  def load_categories_with_libs() do
-    libs_query = from(l in Lib, order_by: l.name)
+  def load_categories_with_libs(min_stars) do
+    conditions = []
 
-    from(p in Category, order_by: p.name, preload: [libs: ^libs_query])
+    conditions = if min_stars do
+      dynamic([c, l], l.stars >= ^min_stars)
+    else
+      conditions
+    end
+
+    from(
+      c in Category,
+      join: l in assoc(c, :libs),
+      order_by: c.name,
+      order_by: l.name,
+      where: ^conditions,
+      preload: [libs: l]
+    )
     |> Repo.all()
   end
 

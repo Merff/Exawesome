@@ -12,8 +12,6 @@ defmodule Exawesome.SaveDataContext do
         |> upsert_category()
 
       Enum.each(category_params[:libs], fn lib ->
-        [_, _, repo_owner, repo_name | _] = Path.split(lib[:href])
-
         lib_params = %{
           name: lib[:lib_title],
           description: lib[:lib_desc],
@@ -21,9 +19,13 @@ defmodule Exawesome.SaveDataContext do
           category_id: category_record.id
         }
 
+        [_, _, repo_owner, repo_name | _] = Path.split(lib[:href])
+
         lib_params =
           case GithubApi.get_repo_info(repo_owner, repo_name) do
             %{stars: stars, last_commit: last_commit} ->
+              {:ok, last_commit, _} = DateTime.from_iso8601(last_commit)
+
               lib_params
               |> Map.put(:stars, stars)
               |> Map.put(:last_commit, last_commit)
