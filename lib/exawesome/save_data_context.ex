@@ -3,23 +3,22 @@ defmodule Exawesome.SaveDataContext do
   alias Exawesome.{Repo, GithubApi, Category, Lib}
 
   def upsert(params) do
-    #require IEx; IEx.pry()
-    Enum.each(params, fn category ->
-      category =
+    Enum.each(params, fn category_params ->
+      {:ok, category_record} =
         %{
-          name: category[:category_title],
-          description: category[:category_desc]
+          name: category_params[:category_title],
+          description: category_params[:category_desc]
         }
         |> upsert_category()
 
-      Enum.each(category[:libs], fn lib ->
+      Enum.each(category_params[:libs], fn lib ->
         [_, _, repo_owner, repo_name | _] = Path.split(lib[:href])
 
         lib_params = %{
           name: lib[:lib_title],
           description: lib[:lib_desc],
           href: lib[:href],
-          category_id: category[:id]
+          category_id: category_record.id
         }
 
         lib_params =
@@ -38,7 +37,7 @@ defmodule Exawesome.SaveDataContext do
   end
 
   def upsert_category(params) do
-    Repo.get_by(Category, name: params.name)
+    Repo.get_by(Category, name: params[:name])
     |> case do
       nil ->
         %Category{}
@@ -52,7 +51,7 @@ defmodule Exawesome.SaveDataContext do
   end
 
   def upsert_lib(params) do
-    Repo.get_by(Lib, href: params.href)
+    Repo.get_by(Lib, href: params[:href])
     |> case do
       nil ->
         %Lib{}
@@ -63,7 +62,5 @@ defmodule Exawesome.SaveDataContext do
         |> Ecto.Changeset.change(params)
         |> Repo.update()
     end
-
   end
-
 end

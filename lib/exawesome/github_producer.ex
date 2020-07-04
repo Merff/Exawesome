@@ -7,9 +7,8 @@ defmodule Exawesome.GithubProducer do
       get_readme_page(@markdown_url)
       |> Earmark.as_ast()
 
-    parsed = parse_ast(ast, [])
-    #require IEx; IEx.pry()
-    Exawesome.SaveDataContext.upsert(parsed)
+    parse_ast(ast, [])
+    |> Exawesome.SaveDataContext.upsert()
   end
 
   def get_readme_page(url) do
@@ -23,9 +22,9 @@ defmodule Exawesome.GithubProducer do
 
   defp parse_ast(ast, accum) do
     case ast do
-      [ {"h2", _, [category_title]},
-        {"p", [], [{"em", [], [category_desc]}]},
-        {"ul", [], libs}
+      [ {"h2", _, [category_title], _},
+        {"p", _, [{"em", _, [category_desc], _}], _},
+        {"ul", _, libs, _}
         | tail ] -> parse_ast(tail, [%{category_title: category_title, category_desc: category_desc, libs: parse_libs(libs)} | accum])
       [_ | tail] -> parse_ast(tail, accum)
       [] -> accum
@@ -34,7 +33,7 @@ defmodule Exawesome.GithubProducer do
 
   defp parse_libs(libs) do
     Enum.flat_map(libs,
-      fn {"li", [], [{"a", [{"href", href}], [lib_title]}, lib_desc]} ->
+      fn {"li", _, [{"a", [{"href", href}], [lib_title], _}, lib_desc], _} ->
         if String.contains?(href, "github.com") do
           [%{href: href, lib_title: lib_title, lib_desc: lib_desc}]
         else

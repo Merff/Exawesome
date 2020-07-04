@@ -11,6 +11,8 @@ defmodule Exawesome.GithubApi do
       {"X-GitHub-Media-Type", "application/vnd.github.scarlet-witch-preview+json"}
     ]
 
+    #require IEx; IEx.pry()
+
     case HTTPoison.get(url, headers) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         resp = Jason.decode!(body)
