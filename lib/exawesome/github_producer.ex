@@ -1,4 +1,4 @@
-defmodule GithubProducer do
+defmodule Exawesome.GithubProducer do
 
   @markdown_url "https://raw.githubusercontent.com/h4cc/awesome-elixir/master/README.md"
 
