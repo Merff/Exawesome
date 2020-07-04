@@ -4,7 +4,7 @@ defmodule GithubProducer do
 
   def produce() do
     {:ok, ast, _} =
-      get_page(@markdown_url)
+      get_readme_page(@markdown_url)
       |> Earmark.as_ast()
 
     parse_ast(ast, [])
@@ -12,10 +12,10 @@ defmodule GithubProducer do
 
   defp parse_ast(ast, accum) do
     case ast do
-      [ {"h2", _, [cat_title]},
-        {"p", [], [{"em", [], [cat_desc]}]},
+      [ {"h2", _, [category_title]},
+        {"p", [], [{"em", [], [category_desc]}]},
         {"ul", [], libs}
-        | tail ] -> parse_ast(tail, [%{cat_title: cat_title, cat_desc: cat_desc, libs: parse_libs(libs)} | accum])
+        | tail ] -> parse_ast(tail, [%{category_title: category_title, category_desc: category_desc, libs: parse_libs(libs)} | accum])
       [_ | tail] -> parse_ast(tail, accum)
       [] -> accum
     end
@@ -25,11 +25,7 @@ defmodule GithubProducer do
     Enum.flat_map(libs,
       fn {"li", [], [{"a", [{"href", href}], [lib_title]}, lib_desc]} ->
         if String.contains?(href, "github.com") do
-          [%{
-            href: href,
-            lib_title: lib_title,
-            lib_desc: lib_desc
-          }]
+          [%{href: href, lib_title: lib_title, lib_desc: lib_desc}]
         else
           []
         end
@@ -37,7 +33,7 @@ defmodule GithubProducer do
     end)
   end
 
-  def get_page(url) do
+  def get_readme_page(url) do
     case HTTPoison.get(url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         body
@@ -45,6 +41,5 @@ defmodule GithubProducer do
         raise("#{url} not available")
     end
   end
-
 end
 
