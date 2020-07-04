@@ -1,20 +1,20 @@
 # Exawesome
 
-To start your Phoenix server:
+Deployed version here:
 
+To start project locally:
+
+  * Clone repo from https://github.com/Merff/Exawesome
+  * Fill db and github-api credentials in config.exs/dev.exs files
   * Install dependencies with `mix deps.get`
   * Create and migrate your database with `mix ecto.setup`
-  * Install Node.js dependencies with `npm install` inside the `assets` directory
-  * Start Phoenix endpoint with `mix phx.server`
+  * Start Phoenix endpoint with `ies -S mix phx.server`
+  * Fetch real data by run in iex console `Exawesome.GithubProducer.produce()`
+  * Wait 😴
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+## TODO
 
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+  * Removes libs which removed from https://github.com/h4cc/awesome-elixir
+  * Make SaveDataContext async
