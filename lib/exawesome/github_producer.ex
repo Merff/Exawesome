@@ -7,7 +7,18 @@ defmodule Exawesome.GithubProducer do
       get_readme_page(@markdown_url)
       |> Earmark.as_ast()
 
-    parse_ast(ast, [])
+    parsed = parse_ast(ast, [])
+    #require IEx; IEx.pry()
+    Exawesome.SaveDataContext.upsert(parsed)
+  end
+
+  def get_readme_page(url) do
+    case HTTPoison.get(url) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        body
+      _ ->
+        raise("#{url} not available")
+    end
   end
 
   defp parse_ast(ast, accum) do
@@ -31,15 +42,6 @@ defmodule Exawesome.GithubProducer do
         end
       _ -> []
     end)
-  end
-
-  def get_readme_page(url) do
-    case HTTPoison.get(url) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        body
-      _ ->
-        raise("#{url} not available")
-    end
   end
 end
 
