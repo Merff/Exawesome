@@ -30,6 +30,12 @@ config :exawesome,
   github_user: System.get_env("GITHUB_USER"),
   github_token: System.get_env("GITHUB_TOKEN")
 
+config :exawesome, Exawesome.Scheduler,
+  jobs: [
+    # Runs every midnight:
+    {"@daily", {Exawesome.GithubProducer, :produce, []}}
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

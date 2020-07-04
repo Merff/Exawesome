@@ -14,7 +14,8 @@ defmodule Exawesome.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Exawesome.PubSub},
       # Start the Endpoint (http/https)
-      ExawesomeWeb.Endpoint
+      ExawesomeWeb.Endpoint,
+      Exawesome.Scheduler
       # Start a worker by calling: Exawesome.Worker.start_link(arg)
       # {Exawesome.Worker, arg}
     ]
