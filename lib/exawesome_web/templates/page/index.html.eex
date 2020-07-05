@@ -27,30 +27,32 @@
   <ul>
     <%= for lib <- category.libs do %>
       <li>
-        <a href="<%= lib.href %>"> <%= lib.name %> </a>
+        <strong><a href="<%= lib.href %>"> <%= lib.name %> </a></strong>
         <span><%= lib.description %></span><br>
 
         <span>
           <%= if lib.stars do %>
-            ☆&nbsp;&nbsp;<small><em><%= lib.stars %></em></small>
+            <big>☆&nbsp;&nbsp;</big><small><em><%= lib.stars %></em></small>
           <% else %>
-            ☆&nbsp;&nbsp;🤷
+            <big>☆&nbsp;&nbsp;🤷</big>
           <% end %>
         </span>
         <br>
 
         <span>
           <% days_left = days_left_from_last_commit(lib.last_commit, @utc_now) %>
-          <%= cond do %>
-            <% is_nil(days_left) -> %>
-              🙀 🤷
-            <% days_left <= 100 -> %>
-              😺
-            <% days_left > 100 && days_left < 300 -> %>
-              😿
-            <% days_left >= 300 -> %>
-              🙀
-          <% end %>
+          <big>
+            <%= cond do %>
+              <% is_nil(days_left) -> %>
+                🙀 🤷
+              <% days_left <= 100 -> %>
+                😺
+              <% days_left > 100 && days_left < 300 -> %>
+                😿
+              <% days_left >= 300 -> %>
+                🙀
+            <% end %>
+          </big>
           <small><em><%= days_left %> days</small></em>
         </span>
       </li>

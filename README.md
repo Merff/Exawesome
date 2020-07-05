@@ -1,6 +1,6 @@
 # Exawesome
 
-Deployed version here:
+Deployed version here: https://stormy-everglades-49901.herokuapp.com
 
 To start project locally:
 
