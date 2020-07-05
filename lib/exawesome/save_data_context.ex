@@ -19,25 +19,27 @@ defmodule Exawesome.SaveDataContext do
               category_id: category_record.id
             }
 
-            [_, _, repo_owner, repo_name | _] = Path.split(lib[:href])
-
-            lib_params =
-              case GithubApi.get_repo_info(repo_owner, repo_name) do
-                %{stars: stars, last_commit: last_commit} ->
-                  {:ok, last_commit, _} = DateTime.from_iso8601(last_commit)
-
-                  lib_params
-                  |> Map.put(:stars, stars)
-                  |> Map.put(:last_commit, last_commit)
-                :error ->
-                  lib_params
-              end
-
-            upsert_lib(lib_params)
+            extend_lib_params_by_github_api(lib_params)
+            |> upsert_lib()
           end)
         _ -> :error
       end
     end)
+  end
+
+  defp extend_lib_params_by_github_api(lib_params) do
+    [_, _, repo_owner, repo_name | _] = Path.split(lib_params[:href])
+
+    case GithubApi.get_repo_info(repo_owner, repo_name) do
+      %{stars: stars, last_commit: last_commit} ->
+        {:ok, last_commit, _} = DateTime.from_iso8601(last_commit)
+
+        lib_params
+        |> Map.put(:stars, stars)
+        |> Map.put(:last_commit, last_commit)
+      :error ->
+        lib_params
+    end
   end
 
   defp upsert_category(%{name: nil}), do: :error
