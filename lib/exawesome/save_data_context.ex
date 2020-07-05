@@ -4,41 +4,44 @@ defmodule Exawesome.SaveDataContext do
 
   def upsert(params) do
     Enum.each(params, fn category_params ->
-      {:ok, category_record} =
-        %{
-          name: category_params[:category_title],
-          description: category_params[:category_desc]
-        }
-        |> upsert_category()
+      %{
+        name: category_params[:category_title],
+        description: category_params[:category_desc]
+      }
+      |> upsert_category()
+      |> case do
+        {:ok, category_record} ->
+          Enum.each(category_params[:libs], fn lib ->
+            lib_params = %{
+              name: lib[:lib_title],
+              description: lib[:lib_desc],
+              href: lib[:href],
+              category_id: category_record.id
+            }
 
-      Enum.each(category_params[:libs], fn lib ->
-        lib_params = %{
-          name: lib[:lib_title],
-          description: lib[:lib_desc],
-          href: lib[:href],
-          category_id: category_record.id
-        }
+            [_, _, repo_owner, repo_name | _] = Path.split(lib[:href])
 
-        [_, _, repo_owner, repo_name | _] = Path.split(lib[:href])
+            lib_params =
+              case GithubApi.get_repo_info(repo_owner, repo_name) do
+                %{stars: stars, last_commit: last_commit} ->
+                  {:ok, last_commit, _} = DateTime.from_iso8601(last_commit)
 
-        lib_params =
-          case GithubApi.get_repo_info(repo_owner, repo_name) do
-            %{stars: stars, last_commit: last_commit} ->
-              {:ok, last_commit, _} = DateTime.from_iso8601(last_commit)
+                  lib_params
+                  |> Map.put(:stars, stars)
+                  |> Map.put(:last_commit, last_commit)
+                :error ->
+                  lib_params
+              end
 
-              lib_params
-              |> Map.put(:stars, stars)
-              |> Map.put(:last_commit, last_commit)
-            :error ->
-              lib_params
-          end
-
-        upsert_lib(lib_params)
-      end)
+            upsert_lib(lib_params)
+          end)
+        _ -> :error
+      end
     end)
   end
 
-  def upsert_category(params) do
+  defp upsert_category(%{name: nil}), do: :error
+  defp upsert_category(params) do
     Repo.get_by(Category, name: params[:name])
     |> case do
       nil ->
@@ -52,7 +55,8 @@ defmodule Exawesome.SaveDataContext do
     end
   end
 
-  def upsert_lib(params) do
+  defp upsert_lib(%{href: nil}), do: :error
+  defp upsert_lib(params) do
     Repo.get_by(Lib, href: params[:href])
     |> case do
       nil ->

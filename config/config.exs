@@ -33,7 +33,7 @@ config :exawesome,
 config :exawesome, Exawesome.Scheduler,
   jobs: [
     # Runs every midnight:
-    {"@daily", {Exawesome.GithubProducer, :produce, []}}
+    {"@daily", {Exawesome, :update_data, []}}
   ]
 
 # Import environment specific config. This must remain at the bottom

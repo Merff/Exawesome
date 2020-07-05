@@ -8,7 +8,6 @@ defmodule Exawesome.GithubProducer do
       |> Earmark.as_ast()
 
     parse_ast(ast, [])
-    |> Exawesome.SaveDataContext.upsert()
   end
 
   def get_readme_page(url) do

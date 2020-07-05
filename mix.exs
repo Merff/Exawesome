@@ -47,7 +47,8 @@ defmodule Exawesome.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:httpoison, "~> 1.6"},
       {:earmark, "~> 1.4"},
-      {:quantum, "~> 3.0"}
+      {:quantum, "~> 3.0"},
+      {:exvcr, "~> 0.11", only: :test}
     ]
   end
 

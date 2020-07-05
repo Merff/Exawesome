@@ -20,3 +20,11 @@ config :exawesome, ExawesomeWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :exvcr, [
+  vcr_cassette_library_dir: "test/fixture/vcr_cassettes"
+]
+
+if File.exists?("config/test.local.exs") do
+  import_config "test.local.exs"
+end
